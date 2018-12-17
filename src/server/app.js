@@ -18,24 +18,38 @@ module.exports = function() {
 
   const defaultConfig = {
     "queues": [
-          {
-              "name": "localmed",
-              "hostId": "LocalMed",
-              "url": process.env.REDIS_URL
-          },
-          {
-              "name": "default",
-              "hostId": "Default",
-              "url": process.env.REDIS_URL
-          },
-          {
-              "name": "billing",
-              "hostId": "Billing",
-              "url": process.env.REDIS_URL
-          }
-      ]
+      {
+        "name": "localmed",
+        "hostId": "LocalMed",
+        "url": process.env.REDIS_URL
+      },
+      {
+        "name": "default",
+        "hostId": "Default",
+        "url": process.env.REDIS_URL
+      },
+      {
+        "name": "billing",
+        "hostId": "Billing",
+        "url": process.env.REDIS_URL
+      },
+      {
+        "name": "localmed",
+        "hostId": "[Staging] LocalMed",
+        "url": process.env.REDIS_URL_STAGING
+      },
+      {
+        "name": "default",
+        "hostId": "[Staging] Default",
+        "url": process.env.REDIS_URL_STAGING
+      },
+      {
+        "name": "billing",
+        "hostId": "[Staging] Billing",
+        "url": process.env.REDIS_URL_STAGING
+      }
+    ]
   }
-  console.log("DefaultConfig: " + JSON.stringify(defaultConfig,null,4));
   const Queues = require('./queue');
   const queues = new Queues(defaultConfig);
   require('./views/helpers/handlebars')(handlebars, { queues });
