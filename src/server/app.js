@@ -16,8 +16,26 @@ module.exports = function() {
 
   const app = express();
 
-  const defaultConfig = require(path.join(__dirname, 'config', 'index.json'));
-
+  const defaultConfig = {
+    "queues": [
+          {
+              "name": "localmed",
+              "hostId": "LocalMed",
+              "url": process.env.REDIS_URL
+          },
+          {
+              "name": "default",
+              "hostId": "Default",
+              "url": process.env.REDIS_URL
+          },
+          {
+              "name": "billing",
+              "hostId": "Billing",
+              "url": process.env.REDIS_URL
+          }
+      ]
+  }
+  console.log("DefaultConfig: " + JSON.stringify(defaultConfig,null,4));
   const Queues = require('./queue');
   const queues = new Queues(defaultConfig);
   require('./views/helpers/handlebars')(handlebars, { queues });
