@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const Arena = require('./src/server/app');
-const routes = require('./src/server/views/routes');
+ const routes = require('./src/server/views/routes');
 
 function run(config, listenOpts = {}) {
   const {app, Queues} = Arena();
