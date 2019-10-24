@@ -16,40 +16,31 @@ module.exports = function() {
 
   const app = express();
 
+  const jobQueues = (process.env.JOB_QUEUES || '').split(',').map((jobQueue) => {
+    return jobQueue.trim();
+  });
+  const jobQueuesStaging = (process.env.JOB_QUEUES_STAGING || '').split(',').map((jobQueue) => {
+    return jobQueue.trim();
+  });
+
   const defaultConfig = {
-    "queues": [
-      {
-        "name": "localmed",
-        "hostId": "LocalMed",
-        "url": process.env.REDIS_URL
-      },
-      {
-        "name": "default",
-        "hostId": "Default",
-        "url": process.env.REDIS_URL
-      },
-      {
-        "name": "billing",
-        "hostId": "Billing",
-        "url": process.env.REDIS_URL
-      },
-      {
-        "name": "localmed",
-        "hostId": "[Staging] LocalMed",
-        "url": process.env.REDIS_URL_STAGING
-      },
-      {
-        "name": "default",
-        "hostId": "[Staging] Default",
-        "url": process.env.REDIS_URL_STAGING
-      },
-      {
-        "name": "billing",
-        "hostId": "[Staging] Billing",
-        "url": process.env.REDIS_URL_STAGING
-      }
-    ]
-  }
+    queues: []
+  };
+  defaultConfig.queues = defaultConfig.queues.concat(jobQueues.map((jobQueue) => {
+    return {
+      name: jobQueue,
+      hostId: jobQueue.toUpperCase(),
+      url: process.env.REDIS_URL
+    };
+  }));
+  defaultConfig.queues = defaultConfig.queues.concat(jobQueuesStaging.map((jobQueue) => {
+    return {
+      name: jobQueue,
+      hostId: jobQueue.toUpperCase(),
+      url: rocess.env.REDIS_URL_STAGING
+    };
+  }));
+
   const Queues = require('./queue');
   const queues = new Queues(defaultConfig);
   require('./views/helpers/handlebars')(handlebars, { queues });
