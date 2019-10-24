@@ -37,7 +37,7 @@ module.exports = function() {
     return {
       name: jobQueue,
       hostId: jobQueue.toUpperCase(),
-      url: rocess.env.REDIS_URL_STAGING
+      url: process.env.REDIS_URL_STAGING
     };
   }));
 
