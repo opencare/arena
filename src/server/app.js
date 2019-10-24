@@ -29,14 +29,14 @@ module.exports = function() {
   defaultConfig.queues = defaultConfig.queues.concat(jobQueues.map((jobQueue) => {
     return {
       name: jobQueue,
-      hostId: jobQueue.toUpperCase(),
+      hostId: jobQueue,
       url: process.env.REDIS_URL
     };
   }));
   defaultConfig.queues = defaultConfig.queues.concat(jobQueuesStaging.map((jobQueue) => {
     return {
       name: jobQueue,
-      hostId: jobQueue.toUpperCase(),
+      hostId: `[staging] ${jobQueue}`,
       url: process.env.REDIS_URL_STAGING
     };
   }));
