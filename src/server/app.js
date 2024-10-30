@@ -1,8 +1,21 @@
 const express = require('express');
-const path = require('path');
 const bodyParser = require('body-parser');
 const handlebars = require('handlebars');
 const exphbs = require('express-handlebars');
+
+/**
+ * Parses a comma-separated string into an array of trimmed job queue names.
+ *
+ * @param {string} value - The comma-separated string to be parsed. If the input is not a string,
+ *                         an empty array is returned.
+ * @returns {string[]} An array of trimmed job queue names parsed from the input string.
+ */
+const parseJobQueues = value => {
+  if (typeof value !== 'string') {
+    return [];
+  }
+  return value.split(',').map(item => item.trim());
+};
 
 module.exports = function() {
   const hbs = exphbs.create({
@@ -16,33 +29,31 @@ module.exports = function() {
 
   const app = express();
 
-  const jobQueues = (process.env.JOB_QUEUES || '').split(',').map((jobQueue) => {
-    return jobQueue.trim();
-  });
-  const jobQueuesStaging = (process.env.JOB_QUEUES_STAGING || '').split(',').map((jobQueue) => {
-    return jobQueue.trim();
-  });
+  const jobQueues = parseJobQueues(process.env.JOB_QUEUES);
+  const jobQueuesStaging = parseJobQueues(process.env.JOB_QUEUES_STAGING);
+  const redisUrl = process.env.REDIS_URL;
+  const redisUrlStaging = process.env.REDIS_URL_STAGING;
 
-  const defaultConfig = {
-    queues: []
+  const config = {
+    queues: [],
   };
-  defaultConfig.queues = defaultConfig.queues.concat(jobQueues.map((jobQueue) => {
-    return {
+  if (redisUrl) {
+    config.queues.push(...jobQueues.map(jobQueue => ({
       name: jobQueue,
       hostId: jobQueue,
-      url: process.env.REDIS_URL
-    };
-  }));
-  defaultConfig.queues = defaultConfig.queues.concat(jobQueuesStaging.map((jobQueue) => {
-    return {
+      url: redisUrl,
+    })));
+  }
+  if (redisUrlStaging) {
+    config.queues.push(...jobQueuesStaging.map(jobQueue => ({
       name: jobQueue,
       hostId: `[staging] ${jobQueue}`,
-      url: process.env.REDIS_URL_STAGING
-    };
-  }));
+      url: redisUrlStaging,
+    })));
+  }
 
   const Queues = require('./queue');
-  const queues = new Queues(defaultConfig);
+  const queues = new Queues(config);
   require('./views/helpers/handlebars')(handlebars, { queues });
   app.locals.Queues = queues;
   app.locals.appBasePath = '';
