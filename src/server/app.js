@@ -40,14 +40,14 @@ module.exports = function() {
   if (redisUrl) {
     config.queues.push(...jobQueues.map(jobQueue => ({
       name: jobQueue,
-      hostId: jobQueue,
+      hostId: 'production',
       url: redisUrl,
     })));
   }
   if (redisUrlStaging) {
     config.queues.push(...jobQueuesStaging.map(jobQueue => ({
       name: jobQueue,
-      hostId: `[staging] ${jobQueue}`,
+      hostId: 'staging',
       url: redisUrlStaging,
     })));
   }
